@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LETHAL aim | Real Sales & Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .gradient-text { background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .admin-panel { display: none; }
+        .admin-panel.active { display: block; }
+        .shop-view.hidden { display: none; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .step { display: none; }
+        .step.active { display: block; }
+        
+        .status-badge { font-size: 10px; padding: 4px 10px; border-radius: 99px; font-weight: 800; text-transform: uppercase; }
+        .btn-action { transition: all 0.2s; cursor: pointer; }
+        .btn-action:hover { transform: scale(1.1); }
+    </style>
+</head>
+<body class="bg-slate-950 text-white overflow-x-hidden">
+
+    <!-- Cabeçalho -->
+    <header class="fixed w-full z-50 glass border-b border-blue-900/50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="window.location.reload()">
+                <i data-lucide="target" class="w-8 h-8 text-blue-500"></i>
+                <span class="text-2xl font-extrabold tracking-tighter uppercase">LETHAL <span class="text-blue-500">aim</span></span>
+            </div>
+            
+            <nav class="hidden md:flex space-x-8 font-medium text-slate-300">
+                <a href="#home" class="hover:text-blue-400 transition">Início</a>
+                <a href="#produtos" class="hover:text-blue-400 transition">Produtos</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <button type="button" id="adminBtn" onclick="openAdminAuth()" class="bg-blue-600/10 border border-blue-500/30 hover:border-blue-500 text-blue-400 px-6 py-2 rounded-full font-bold transition text-sm text-nowrap">
+                    Painel Admin
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- VISÃO DA LOJA -->
+    <main id="shopView" class="shop-view">
+        <section id="home" class="relative pt-48 pb-20 px-6">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-blue-600/10 blur-[120px] rounded-full -z-10"></div>
+            <div class="max-w-7xl mx-auto text-center">
+                <h1 class="text-6xl md:text-8xl font-extrabold mb-6 leading-tight tracking-tighter uppercase">Lethal <span class="gradient-text">Aim</span></h1>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto mb-10">Ficheiros premium para a elite. Entrega garantida e suporte especializado.</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="#produtos" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-2xl font-bold transition shadow-xl shadow-blue-900/20 uppercase text-xs">Explorar Produtos</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="produtos" class="py-24 px-6">
+            <div class="max-w-7xl mx-auto" id="productsContainer">
+                <div class="flex justify-center py-20"><div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- PAINEL ADMIN -->
+    <main id="adminView" class="admin-panel pt-32 pb-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div>
+                    <h2 class="text-4xl font-bold mb-4 uppercase tracking-tighter text-blue-500">Área de Controlo</h2>
+                    <div class="flex space-x-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
+                        <button type="button" onclick="switchAdminTab('tab-products')" class="admin-tab-btn active px-6 py-2.5 rounded-xl text-sm font-bold transition" id="btn-tab-products">Produtos</button>
+                        <button type="button" onclick="switchAdminTab('tab-coupons')" class="admin-tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition text-slate-500" id="btn-tab-coupons">Cupons</button>
+                        <button type="button" onclick="switchAdminTab('tab-orders')" class="admin-tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition text-slate-500" id="btn-tab-orders">Vendas/Pedidos</button>
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <button type="button" onclick="toggleView('shop')" class="bg-slate-900 border border-slate-800 px-6 py-3 rounded-xl font-bold text-sm text-slate-400 hover:text-white">Voltar à Loja</button>
+                    <button type="button" id="addGenericBtn" onclick="openGenericAdd()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-bold text-sm flex items-center">
+                        <i data-lucide="plus" class="mr-2 w-4 h-4"></i> Adicionar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabs Conteúdo -->
+            <div id="tab-products" class="tab-content active glass rounded-3xl overflow-hidden border border-slate-800">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900/50 text-slate-500 uppercase text-[10px] font-black tracking-widest"><tr class="border-b border-slate-800"><th class="px-8 py-5">Nome</th><th class="px-8 py-5">Preço</th><th class="px-8 py-5 text-right">Ações</th></tr></thead>
+                    <tbody id="adminTableProducts" class="divide-y divide-slate-900/50"></tbody>
+                </table>
+            </div>
+
+            <div id="tab-coupons" class="tab-content glass rounded-3xl overflow-hidden border border-slate-800">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900/50 text-slate-500 uppercase text-[10px] font-black tracking-widest"><tr class="border-b border-slate-800"><th class="px-8 py-5">Código</th><th class="px-8 py-5">Desconto</th><th class="px-8 py-5 text-right">Ações</th></tr></thead>
+                    <tbody id="adminTableCoupons" class="divide-y divide-slate-900/50"></tbody>
+                </table>
+            </div>
+
+            <div id="tab-orders" class="tab-content glass rounded-3xl overflow-hidden border border-slate-800">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900/50 text-slate-500 uppercase text-[10px] font-black tracking-widest"><tr class="border-b border-slate-800"><th class="px-8 py-5">Data</th><th class="px-8 py-5">Cliente</th><th class="px-8 py-5">Produto/Valor</th><th class="px-8 py-5 text-right">Controlo</th></tr></thead>
+                    <tbody id="adminTableOrders" class="divide-y divide-slate-900/50"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAIS -->
+    <div id="buyModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md">
+        <div class="glass max-w-md w-full p-8 md:p-10 rounded-[2.5rem] border border-blue-500/20 shadow-2xl relative">
+            <button type="button" onclick="closeModal('buyModal')" class="absolute top-6 right-6 text-slate-500 hover:text-white"><i data-lucide="x"></i></button>
+            <div id="checkoutStep1" class="step active text-center">
+                <div id="buyProductImg" class="w-20 h-20 bg-slate-900 rounded-2xl mx-auto mb-6 flex items-center justify-center overflow-hidden border border-slate-800"></div>
+                <h3 id="buyProductName" class="text-2xl font-bold mb-2 uppercase tracking-tighter">Produto</h3>
+                <div class="bg-slate-900/50 p-6 rounded-3xl border border-slate-800 mb-6 text-center">
+                    <span id="finalPrice" class="text-3xl font-black text-blue-400">R$ 0.00</span>
+                    <div class="flex space-x-2 mt-4">
+                        <input type="text" id="inputCoupon" placeholder="Cupom?" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 outline-none focus:border-blue-500 uppercase text-xs">
+                        <button type="button" onclick="applyCoupon()" class="bg-slate-800 px-4 py-2 rounded-xl text-xs font-bold transition">Aplicar</button>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-[10px] font-black text-blue-500 uppercase mb-2 text-left ml-2">E-mail de Entrega</label>
+                    <input type="email" id="customerEmail" placeholder="seu@email.com" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 text-center font-bold">
+                </div>
+                <button type="button" onclick="startPaymentFlow(event)" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center shadow-lg shadow-blue-900/40">
+                    Ir para Pagamento Real <i data-lucide="external-link" class="ml-2 w-4 h-4"></i>
+                </button>
+            </div>
+            <div id="checkoutStep2" class="step text-center py-6">
+                <div class="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="check-circle" class="w-8 h-8 text-blue-500"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 uppercase">Pagamento Aberto</h3>
+                <p class="text-slate-400 text-sm mb-6">Uma nova aba abriu. Regresse aqui assim que terminar para descarregar.</p>
+                <button type="button" onclick="closeModal('buyModal')" class="w-full bg-slate-900 border border-slate-800 py-4 rounded-xl font-bold text-xs uppercase tracking-widest">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sucesso -->
+    <div id="successModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md">
+        <div class="glass max-w-md w-full p-10 rounded-[3rem] text-center border border-green-500/20 shadow-2xl">
+            <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
+                <i data-lucide="check" class="w-10 h-10 text-green-500"></i>
+            </div>
+            <h2 class="text-3xl font-black mb-4 uppercase tracking-tighter text-green-400">Sucesso!</h2>
+            <p class="text-slate-400 text-sm mb-10">Pagamento confirmado. Baixe seu arquivo:</p>
+            <a id="downloadBtn" href="#" target="_blank" class="w-full bg-green-600 hover:bg-green-700 py-5 rounded-2xl font-bold uppercase tracking-widest text-sm flex items-center justify-center transition-all animate-bounce">
+                <i data-lucide="download" class="mr-2 w-5 h-5"></i> Link de Download
+            </a>
+            <button type="button" onclick="window.location.href='index.html'" class="mt-8 text-slate-500 text-xs hover:text-white transition">Finalizar</button>
+        </div>
+    </div>
+
+    <!-- LOGIN ADMIN -->
+    <div id="authModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md">
+        <div class="glass max-w-sm w-full p-10 rounded-[2.5rem] text-center shadow-2xl border border-blue-500/10">
+            <h3 class="text-2xl font-bold mb-8 uppercase tracking-widest text-blue-500">Segurança</h3>
+            <input type="password" id="adminPass" placeholder="Palavra-passe" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 mb-4 focus:border-blue-500 outline-none text-center">
+            <button type="button" onclick="checkAdminAuth()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest">Desbloquear</button>
+            <button type="button" onclick="closeModal('authModal')" class="mt-4 text-slate-500 text-sm">Sair</button>
+        </div>
+    </div>
+
+    <!-- Modal Editar/Criar Produto -->
+    <div id="productModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md">
+        <div class="glass max-w-2xl w-full p-10 rounded-[2.5rem] overflow-y-auto max-h-[90vh]">
+            <h3 id="productModalTitle" class="text-2xl font-bold mb-8 uppercase tracking-tighter">Dados do Arquivo</h3>
+            <form id="productForm" class="space-y-4">
+                <input type="hidden" id="editProductId">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="pName" required placeholder="Nome do Arquivo" class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                    <input type="text" id="pCategory" required placeholder="Categoria" class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" step="0.01" id="pPrice" required placeholder="Preço (R$)" class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                    <input type="url" id="pImg" placeholder="Link da Imagem" class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                </div>
+                <div class="bg-blue-600/5 p-5 rounded-2xl border border-blue-500/20">
+                    <label class="block text-[10px] font-black text-blue-400 uppercase mb-3">Links Operacionais</label>
+                    <input type="text" id="pPaymentLink" required placeholder="Link Mercado Pago (ex: mpago.la/...)" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 mb-3 outline-none focus:border-blue-500">
+                    <input type="url" id="pFileUrl" required placeholder="Link de Download Direto" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                </div>
+                <textarea id="pDesc" rows="3" placeholder="Pequena descrição..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-blue-500 resize-none"></textarea>
+                <button type="submit" class="w-full bg-blue-600 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs">Guardar Alterações</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Cupom -->
+    <div id="couponModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md">
+        <div class="glass max-w-sm w-full p-10 rounded-[2.5rem]">
+            <h3 class="text-2xl font-bold mb-8 uppercase tracking-tighter">Gerar Desconto</h3>
+            <form id="couponForm" class="space-y-4">
+                <input type="text" id="cCode" required placeholder="CÓDIGO (ex: LETHAL10)" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 uppercase">
+                <input type="number" id="cDiscount" required placeholder="Desconto %" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 outline-none focus:border-blue-500">
+                <button type="submit" class="w-full bg-blue-600 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs">Ativar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase e Lógica -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDl2p1KyuFPWDrQ0njJrs2kvRksP0TpnYg",
+            authDomain: "assistencia-91365.firebaseapp.com",
+            projectId: "assistencia-91365",
+            storageBucket: "assistencia-91365.firebasestorage.app",
+            messagingSenderId: "1021342121618",
+            appId: "1:1021342121618:web:e04a27dd5342b3ef80704b",
+            measurementId: "G-JL66KTBBCE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'lethal-aim-shop'; 
+        
+        const productsCol = collection(db, 'artifacts', appId, 'public', 'data', 'products');
+        const couponsCol = collection(db, 'artifacts', appId, 'public', 'data', 'coupons');
+        const ordersCol = collection(db, 'artifacts', appId, 'public', 'data', 'orders');
+
+        let products = [];
+        let coupons = [];
+        let orders = [];
+        let currentProduct = null;
+        let finalPriceVal = 0;
+
+        // AUTH & INIT
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token).catch(() => signInAnonymously(auth));
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) { console.error("Falha na Auth:", err); }
+        };
+
+        onAuthStateChanged(auth, (u) => { 
+            if (u) { loadData(); checkSuccessRedirect(); }
+        });
+
+        initAuth();
+
+        function loadData() {
+            if (!auth.currentUser) return;
+
+            onSnapshot(productsCol, (snap) => {
+                products = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderShop();
+                renderAdminProducts();
+                lucide.createIcons();
+            });
+
+            onSnapshot(couponsCol, (snap) => {
+                coupons = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderAdminCoupons();
+                lucide.createIcons();
+            });
+
+            onSnapshot(ordersCol, (snap) => {
+                orders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderAdminOrders();
+                lucide.createIcons();
+            });
+        }
+
+        function checkSuccessRedirect() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status') || urlParams.get('collection_status');
+            const prodId = urlParams.get('external_reference'); 
+
+            if (status === 'approved' && prodId) {
+                const check = () => {
+                    const p = products.find(x => x.id === prodId);
+                    if (p) {
+                        document.getElementById('downloadBtn').href = p.fileUrl;
+                        document.getElementById('successModal').classList.remove('hidden');
+                        lucide.createIcons();
+                    } else if (products.length > 0) {
+                        console.log("Aguardando carregamento...");
+                    } else {
+                        setTimeout(check, 500);
+                    }
+                };
+                check();
+            }
+        }
+
+        function renderShop() {
+            const container = document.getElementById('productsContainer');
+            const cats = [...new Set(products.map(p => p.category))];
+            let html = '';
+            cats.forEach(cat => {
+                const catP = products.filter(p => p.category === cat);
+                html += `<div class="mb-16">
+                    <h2 class="text-xl font-black uppercase text-blue-500 mb-8 ml-2 tracking-widest">${cat}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        ${catP.map(p => `
+                            <div class="glass p-6 rounded-[2.5rem] border border-slate-900 hover:border-blue-500/30 transition-all duration-500 shadow-lg">
+                                <div class="aspect-video bg-slate-900 rounded-2xl mb-6 flex items-center justify-center overflow-hidden border border-slate-800">
+                                    ${p.imageUrl ? `<img src="${p.imageUrl}" class="w-full h-full object-cover">` : `<i data-lucide="file-code" class="w-10 h-10 text-slate-800"></i>`}
+                                </div>
+                                <h3 class="text-xl font-bold mb-2 uppercase tracking-tight">${p.name}</h3>
+                                <p class="text-slate-500 text-xs mb-8 line-clamp-2 h-8 leading-relaxed">${p.description || ''}</p>
+                                <div class="flex items-center justify-between border-t border-slate-800 pt-6">
+                                    <span class="text-2xl font-black">R$ ${parseFloat(p.price).toFixed(2)}</span>
+                                    <button type="button" onclick="openCheckout('${p.id}')" class="bg-blue-600 p-4 rounded-2xl hover:bg-blue-700 transition shadow-lg shadow-blue-900/20"><i data-lucide="shopping-cart" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html || `<div class="text-center py-20 text-slate-700 font-bold uppercase tracking-widest animate-pulse">Carregando Inventário...</div>`;
+            lucide.createIcons();
+        }
+
+        // GLOBAL ACTIONS
+        window.openCheckout = (id) => {
+            currentProduct = products.find(p => p.id === id);
+            if (!currentProduct) return;
+            finalPriceVal = parseFloat(currentProduct.price);
+            
+            document.getElementById('buyProductName').innerText = currentProduct.name;
+            document.getElementById('finalPrice').innerText = `R$ ${finalPriceVal.toFixed(2)}`;
+            document.getElementById('buyProductImg').innerHTML = currentProduct.imageUrl ? `<img src="${currentProduct.imageUrl}" class="w-full h-full object-cover">` : `<i data-lucide="package" class="w-8 h-8 text-slate-800"></i>`;
+            
+            document.getElementById('inputCoupon').value = '';
+            document.getElementById('customerEmail').value = '';
+            setStep(1);
+            document.getElementById('buyModal').classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.startPaymentFlow = async (e) => {
+            if (e) e.preventDefault();
+            if (!auth.currentUser) return alert("Erro de ligação. Recarregue.");
+
+            const emailInput = document.getElementById('customerEmail');
+            const email = emailInput.value.trim();
+            
+            if (!email || !email.includes('@')) {
+                alert("Insira um e-mail válido para a entrega.");
+                emailInput.focus();
+                return;
+            }
+
+            if (!currentProduct.paymentLink) return alert("Erro: Link de checkout não configurado.");
+
+            setStep(2);
+
+            try {
+                await addDoc(ordersCol, {
+                    email: email,
+                    productId: currentProduct.id,
+                    productName: currentProduct.name,
+                    price: finalPriceVal,
+                    status: 'pendente',
+                    createdAt: Date.now()
+                });
+
+                let rawUrl = currentProduct.paymentLink.trim();
+                if (!rawUrl.startsWith('http')) rawUrl = 'https://' + rawUrl;
+
+                const urlObj = new URL(rawUrl);
+                const separator = urlObj.search ? '&' : '?';
+                const finalRedir = urlObj.href + separator + 'external_reference=' + currentProduct.id;
+
+                window.open(finalRedir, '_blank');
+
+            } catch (err) {
+                console.error("Erro checkout:", err);
+                alert("Erro ao registar pedido no banco de dados.");
+                setStep(1);
+            }
+        };
+
+        window.applyCoupon = () => {
+            const code = document.getElementById('inputCoupon').value.trim().toUpperCase();
+            const cp = coupons.find(c => c.code.toUpperCase() === code);
+            if (cp) {
+                const disc = (parseFloat(currentProduct.price) * (parseFloat(cp.discountPercent) / 100));
+                finalPriceVal = parseFloat(currentProduct.price) - disc;
+                document.getElementById('finalPrice').innerText = `R$ ${finalPriceVal.toFixed(2)}`;
+                alert("Cupom de " + cp.discountPercent + "% aplicado!");
+            } else { alert("Cupom inválido ou expirado."); }
+        };
+
+        // ADMIN FUNCTIONS
+        function renderAdminProducts() {
+            const tbody = document.getElementById('adminTableProducts');
+            tbody.innerHTML = products.map(p => `
+                <tr class="hover:bg-slate-900 transition border-b border-slate-900/50">
+                    <td class="px-8 py-5 font-bold">${p.name}</td>
+                    <td class="px-8 py-5 font-mono text-blue-400">R$ ${parseFloat(p.price).toFixed(2)}</td>
+                    <td class="px-8 py-5 text-right space-x-3 text-nowrap">
+                        <button type="button" onclick="editProduct('${p.id}')" class="btn-action text-slate-400 hover:text-white"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                        <button type="button" onclick="deleteDocById('products', '${p.id}')" class="btn-action text-red-500/50 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </td>
+                </tr>`).join('');
+            lucide.createIcons();
+        }
+
+        function renderAdminCoupons() {
+            const tbody = document.getElementById('adminTableCoupons');
+            tbody.innerHTML = coupons.map(c => `
+                <tr class="hover:bg-slate-900 transition border-b border-slate-900/50">
+                    <td class="px-8 py-5 font-black text-blue-400 tracking-widest uppercase text-nowrap">${c.code}</td>
+                    <td class="px-8 py-5 font-bold">${c.discountPercent}%</td>
+                    <td class="px-8 py-5 text-right">
+                        <button type="button" onclick="deleteDocById('coupons', '${c.id}')" class="btn-action text-red-500/50 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </td>
+                </tr>`).join('');
+            lucide.createIcons();
+        }
+
+        function renderAdminOrders() {
+            const tbody = document.getElementById('adminTableOrders');
+            const sorted = orders.sort((a,b) => b.createdAt - a.createdAt);
+            tbody.innerHTML = sorted.map(o => `
+                <tr class="hover:bg-slate-900 transition border-b border-slate-900/50 text-xs">
+                    <td class="px-8 py-5 text-slate-500 text-nowrap">${new Date(o.createdAt).toLocaleDateString()}</td>
+                    <td class="px-8 py-5 font-bold text-nowrap">${o.email}</td>
+                    <td class="px-8 py-5">
+                        <div class="font-bold text-nowrap">${o.productName}</div>
+                        <div class="text-blue-400 font-mono text-[10px]">R$ ${parseFloat(o.price).toFixed(2)}</div>
+                    </td>
+                    <td class="px-8 py-5 text-right">
+                        <div class="flex items-center justify-end space-x-2">
+                            <span class="status-badge ${o.status === 'aprovado' ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'}">
+                                ${o.status}
+                            </span>
+                            <div class="flex space-x-1">
+                                ${o.status !== 'aprovado' ? `
+                                    <button type="button" onclick="approveOrder('${o.id}')" class="btn-action bg-green-500/10 p-2 rounded-lg text-green-500 hover:bg-green-500 hover:text-white" title="Aprovar">
+                                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                    </button>
+                                ` : ''}
+                                <button type="button" onclick="sendProductEmail('${o.id}')" class="btn-action bg-blue-500/10 p-2 rounded-lg text-blue-500 hover:bg-blue-500 hover:text-white" title="Enviar E-mail">
+                                    <i data-lucide="mail" class="w-4 h-4"></i>
+                                </button>
+                                <button type="button" onclick="deleteDocById('orders', '${o.id}')" class="btn-action bg-red-500/10 p-2 rounded-lg text-red-500 hover:bg-red-500 hover:text-white" title="Excluir Registro">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>`).join('');
+            lucide.createIcons();
+        }
+
+        window.sendProductEmail = (orderId) => {
+            const order = orders.find(o => o.id === orderId);
+            const product = products.find(p => p.id === order.productId);
+            if (!order || !product) return alert("Dados não encontrados.");
+            const sub = encodeURIComponent(`LETHAL aim - Entrega: ${product.name}`);
+            const body = encodeURIComponent(`Olá!\n\nAqui está o link para descarregar o seu ficheiro:\n${product.fileUrl}\n\nObrigado pela compra!`);
+            window.location.href = `mailto:${order.email}?subject=${sub}&body=${body}`;
+        };
+
+        window.approveOrder = async (id) => {
+            if (!auth.currentUser) return;
+            try {
+                const orderRef = doc(db, 'artifacts', appId, 'public', 'data', 'orders', id);
+                await updateDoc(orderRef, { status: 'aprovado' });
+                alert("Pedido aprovado com sucesso!");
+            } catch (e) {
+                console.error("Erro aprovação:", e);
+                alert("Erro ao aprovar: " + e.message);
+            }
+        };
+
+        window.deleteDocById = async (collectionName, docId) => {
+            if (!auth.currentUser) return alert("Aguarde a autenticação.");
+            if (confirm("Deseja realmente eliminar este registo permanentemente?")) {
+                try {
+                    // Ref: artifacts/{appId}/public/data/{collection}/{docId}
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId);
+                    await deleteDoc(docRef);
+                    console.log(`Documento ${docId} removido da coleção ${collectionName}`);
+                    // O onSnapshot cuida do resto
+                } catch (e) {
+                    console.error("Erro na exclusão:", e);
+                    alert("Falha ao excluir do Firebase: " + e.message);
+                }
+            }
+        };
+
+        window.editProduct = (id) => {
+            const p = products.find(x => x.id === id);
+            if (!p) return;
+            document.getElementById('editProductId').value = p.id;
+            document.getElementById('pName').value = p.name;
+            document.getElementById('pCategory').value = p.category;
+            document.getElementById('pPrice').value = p.price;
+            document.getElementById('pImg').value = p.imageUrl || '';
+            document.getElementById('pPaymentLink').value = p.paymentLink || '';
+            document.getElementById('pFileUrl').value = p.fileUrl || '';
+            document.getElementById('pDesc').value = p.description || '';
+            document.getElementById('productModalTitle').innerText = "Editar Produto";
+            document.getElementById('productModal').classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        // SETUP EVENT LISTENERS (Protegido contra NULL)
+        const setupForms = () => {
+            const prodForm = document.getElementById('productForm');
+            if(prodForm) {
+                prodForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!auth.currentUser) return;
+                    const id = document.getElementById('editProductId').value;
+                    const data = {
+                        name: document.getElementById('pName').value,
+                        category: document.getElementById('pCategory').value,
+                        price: document.getElementById('pPrice').value,
+                        imageUrl: document.getElementById('pImg').value,
+                        paymentLink: document.getElementById('pPaymentLink').value,
+                        fileUrl: document.getElementById('pFileUrl').value,
+                        description: document.getElementById('pDesc').value
+                    };
+                    try {
+                        id ? await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id), data, {merge:true}) : await addDoc(productsCol, data);
+                        closeModal('productModal');
+                    } catch (err) { alert("Erro ao salvar produto."); }
+                });
+            }
+
+            const coupForm = document.getElementById('couponForm');
+            if(coupForm) {
+                coupForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!auth.currentUser) return;
+                    try {
+                        await addDoc(couponsCol, {
+                            code: document.getElementById('cCode').value.toUpperCase(),
+                            discountPercent: document.getElementById('cDiscount').value
+                        });
+                        closeModal('couponModal');
+                    } catch (err) { alert("Erro ao salvar cupom."); }
+                });
+            }
+        };
+
+        // UI HELPERS
+        window.openAdminAuth = () => window.isAdmin ? toggleView('admin') : document.getElementById('authModal').classList.remove('hidden');
+        window.checkAdminAuth = () => {
+            if (document.getElementById('adminPass').value === '25112020') { 
+                window.isAdmin = true; 
+                closeModal('authModal'); 
+                toggleView('admin'); 
+                document.getElementById('adminBtn').innerText = "Painel Aberto";
+            } else { alert("Senha Incorreta."); }
+        };
+        window.switchAdminTab = (tabId) => {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.admin-tab-btn').forEach(b => {
+                b.classList.remove('active', 'text-white');
+                b.classList.add('text-slate-500');
+            });
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active', 'text-white');
+            document.getElementById('btn-' + tabId).classList.remove('text-slate-500');
+            lucide.createIcons();
+        };
+        window.setStep = (num) => {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('checkoutStep' + num).classList.add('active');
+            lucide.createIcons();
+        };
+        window.openGenericAdd = () => {
+            const activeTab = document.querySelector('.admin-tab-btn.active').id;
+            if (activeTab === 'btn-tab-products') {
+                document.getElementById('editProductId').value = '';
+                document.getElementById('productForm').reset();
+                document.getElementById('productModalTitle').innerText = "Novo Produto";
+                document.getElementById('productModal').classList.remove('hidden');
+            } else if (activeTab === 'btn-tab-coupons') {
+                document.getElementById('couponForm').reset();
+                document.getElementById('couponModal').classList.remove('hidden');
+            }
+            lucide.createIcons();
+        };
+        window.toggleView = (v) => {
+            document.getElementById('shopView').classList.toggle('hidden', v === 'admin');
+            document.getElementById('adminView').classList.toggle('active', v === 'admin');
+            window.scrollTo(0,0);
+            lucide.createIcons();
+        };
+        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+
+        // Inicializar após carregamento
+        window.addEventListener('load', () => {
+            setupForms();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
