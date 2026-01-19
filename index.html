@@ -104,7 +104,15 @@
 
             <div id="tab-orders" class="tab-content glass rounded-3xl overflow-hidden border border-slate-800">
                 <table class="w-full text-left">
-                    <thead class="bg-slate-900/50 text-slate-500 uppercase text-[10px] font-black tracking-widest"><tr class="border-b border-slate-800"><th class="px-8 py-5">Data</th><th class="px-8 py-5">Cliente</th><th class="px-8 py-5">Produto/Valor</th><th class="px-8 py-5 text-right">Controlo</th></tr></thead>
+                    <thead class="bg-slate-900/50 text-slate-500 uppercase text-[10px] font-black tracking-widest">
+                        <tr class="border-b border-slate-800">
+                            <th class="px-8 py-5">Data</th>
+                            <th class="px-8 py-5">Cliente</th>
+                            <th class="px-8 py-5">Produto/Valor</th>
+                            <th class="px-8 py-5">Cupom</th>
+                            <th class="px-8 py-5 text-right">Controlo</th>
+                        </tr>
+                    </thead>
                     <tbody id="adminTableOrders" class="divide-y divide-slate-900/50"></tbody>
                 </table>
             </div>
@@ -236,6 +244,7 @@
         let orders = [];
         let currentProduct = null;
         let finalPriceVal = 0;
+        let appliedCouponCode = null; // Armazena o cupom atual
 
         // AUTH & INIT
         const initAuth = async () => {
@@ -333,6 +342,7 @@
             currentProduct = products.find(p => p.id === id);
             if (!currentProduct) return;
             finalPriceVal = parseFloat(currentProduct.price);
+            appliedCouponCode = null; // Reseta cupom ao abrir checkout
             
             document.getElementById('buyProductName').innerText = currentProduct.name;
             document.getElementById('finalPrice').innerText = `R$ ${finalPriceVal.toFixed(2)}`;
@@ -363,11 +373,13 @@
             setStep(2);
 
             try {
+                // Adicionado campo 'coupon' no registro do pedido
                 await addDoc(ordersCol, {
                     email: email,
                     productId: currentProduct.id,
                     productName: currentProduct.name,
                     price: finalPriceVal,
+                    coupon: appliedCouponCode || 'Nenhum',
                     status: 'pendente',
                     createdAt: Date.now()
                 });
@@ -394,9 +406,13 @@
             if (cp) {
                 const disc = (parseFloat(currentProduct.price) * (parseFloat(cp.discountPercent) / 100));
                 finalPriceVal = parseFloat(currentProduct.price) - disc;
+                appliedCouponCode = code; // Salva o código aplicado
                 document.getElementById('finalPrice').innerText = `R$ ${finalPriceVal.toFixed(2)}`;
                 alert("Cupom de " + cp.discountPercent + "% aplicado!");
-            } else { alert("Cupom inválido ou expirado."); }
+            } else { 
+                appliedCouponCode = null;
+                alert("Cupom inválido ou expirado."); 
+            }
         };
 
         // ADMIN FUNCTIONS
@@ -438,6 +454,9 @@
                         <div class="font-bold text-nowrap">${o.productName}</div>
                         <div class="text-blue-400 font-mono text-[10px]">R$ ${parseFloat(o.price).toFixed(2)}</div>
                     </td>
+                    <td class="px-8 py-5 font-mono text-blue-300">
+                        ${o.coupon || '-'}
+                    </td>
                     <td class="px-8 py-5 text-right">
                         <div class="flex items-center justify-end space-x-2">
                             <span class="status-badge ${o.status === 'aprovado' ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'}">
@@ -449,6 +468,9 @@
                                         <i data-lucide="check-circle" class="w-4 h-4"></i>
                                     </button>
                                 ` : ''}
+                                <button type="button" onclick="copyLink('${o.productId}')" class="btn-action bg-slate-500/10 p-2 rounded-lg text-slate-400 hover:bg-slate-500 hover:text-white" title="Copiar Link de Download">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                </button>
                                 <button type="button" onclick="sendProductEmail('${o.id}')" class="btn-action bg-blue-500/10 p-2 rounded-lg text-blue-500 hover:bg-blue-500 hover:text-white" title="Enviar E-mail">
                                     <i data-lucide="mail" class="w-4 h-4"></i>
                                 </button>
@@ -461,6 +483,21 @@
                 </tr>`).join('');
             lucide.createIcons();
         }
+
+        // NOVO: Função para copiar o link rapidamente (torna o envio manual muito veloz)
+        window.copyLink = (productId) => {
+            const product = products.find(p => p.id === productId);
+            if (!product || !product.fileUrl) return alert("Link não encontrado.");
+            
+            const tempInput = document.createElement('input');
+            tempInput.value = product.fileUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            
+            alert("Link de download copiado para a área de transferência!");
+        };
 
         window.sendProductEmail = (orderId) => {
             const order = orders.find(o => o.id === orderId);
@@ -487,11 +524,9 @@
             if (!auth.currentUser) return alert("Aguarde a autenticação.");
             if (confirm("Deseja realmente eliminar este registo permanentemente?")) {
                 try {
-                    // Ref: artifacts/{appId}/public/data/{collection}/{docId}
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId);
                     await deleteDoc(docRef);
                     console.log(`Documento ${docId} removido da coleção ${collectionName}`);
-                    // O onSnapshot cuida do resto
                 } catch (e) {
                     console.error("Erro na exclusão:", e);
                     alert("Falha ao excluir do Firebase: " + e.message);
