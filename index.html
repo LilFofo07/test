@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LETHAL aim | Real Sales & Delivery</title>
+    <title>LETHAL aim | Real xits</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -73,10 +73,11 @@
             <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
                 <div>
                     <h2 class="text-4xl font-bold mb-4 uppercase tracking-tighter text-blue-500">Área de Controlo</h2>
-                    <div class="flex space-x-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
+                    <div class="flex flex-wrap gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
                         <button type="button" onclick="switchAdminTab('tab-products')" class="admin-tab-btn active px-6 py-2.5 rounded-xl text-sm font-bold transition" id="btn-tab-products">Produtos</button>
                         <button type="button" onclick="switchAdminTab('tab-coupons')" class="admin-tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition text-slate-500" id="btn-tab-coupons">Cupons</button>
                         <button type="button" onclick="switchAdminTab('tab-orders')" class="admin-tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition text-slate-500" id="btn-tab-orders">Vendas/Pedidos</button>
+                        <button type="button" onclick="switchAdminTab('tab-settings')" class="admin-tab-btn px-6 py-2.5 rounded-xl text-sm font-bold transition text-slate-500" id="btn-tab-settings">Configurações</button>
                     </div>
                 </div>
                 <div class="flex space-x-3">
@@ -104,17 +105,21 @@
 
             <div id="tab-orders" class="tab-content glass rounded-3xl overflow-hidden border border-slate-800">
                 <table class="w-full text-left">
-                    <thead class="bg-slate-900/50 text-slate-500 uppercase text-[10px] font-black tracking-widest">
-                        <tr class="border-b border-slate-800">
-                            <th class="px-8 py-5">Data</th>
-                            <th class="px-8 py-5">Cliente</th>
-                            <th class="px-8 py-5">Produto/Valor</th>
-                            <th class="px-8 py-5">Cupom</th>
-                            <th class="px-8 py-5 text-right">Controlo</th>
-                        </tr>
-                    </thead>
+                    <thead class="bg-slate-900/50 text-slate-500 uppercase text-[10px] font-black tracking-widest"><tr class="border-b border-slate-800"><th class="px-8 py-5">Data</th><th class="px-8 py-5">Cliente / Nome</th><th class="px-8 py-5">Produto/Valor</th><th class="px-8 py-5 text-right">Controlo</th></tr></thead>
                     <tbody id="adminTableOrders" class="divide-y divide-slate-900/50"></tbody>
                 </table>
+            </div>
+
+            <div id="tab-settings" class="tab-content glass rounded-3xl p-10 border border-slate-800">
+                <h3 class="text-xl font-bold mb-6 uppercase tracking-tighter">Configurações Gerais</h3>
+                <div class="max-w-md">
+                    <label class="block text-[10px] font-black text-blue-500 uppercase mb-2">Sua Chave PIX</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="settingPixKey" placeholder="E-mail, CPF ou Aleatória" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                        <button type="button" onclick="saveSettings()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-bold text-sm">Salvar</button>
+                    </div>
+                    <p class="text-slate-500 text-[10px] mt-2 italic">* Esta chave será exibida para o cliente no ato do pagamento.</p>
+                </div>
             </div>
         </div>
     </main>
@@ -126,6 +131,7 @@
             <div id="checkoutStep1" class="step active text-center">
                 <div id="buyProductImg" class="w-20 h-20 bg-slate-900 rounded-2xl mx-auto mb-6 flex items-center justify-center overflow-hidden border border-slate-800"></div>
                 <h3 id="buyProductName" class="text-2xl font-bold mb-2 uppercase tracking-tighter">Produto</h3>
+                
                 <div class="bg-slate-900/50 p-6 rounded-3xl border border-slate-800 mb-6 text-center">
                     <span id="finalPrice" class="text-3xl font-black text-blue-400">R$ 0.00</span>
                     <div class="flex space-x-2 mt-4">
@@ -133,21 +139,48 @@
                         <button type="button" onclick="applyCoupon()" class="bg-slate-800 px-4 py-2 rounded-xl text-xs font-bold transition">Aplicar</button>
                     </div>
                 </div>
-                <div class="mb-6">
-                    <label class="block text-[10px] font-black text-blue-500 uppercase mb-2 text-left ml-2">E-mail de Entrega</label>
-                    <input type="email" id="customerEmail" placeholder="seu@email.com" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 text-center font-bold">
+
+                <div class="space-y-4 mb-6 text-left">
+                    <div>
+                        <label class="block text-[10px] font-black text-blue-500 uppercase mb-2 ml-2">Seu Nome Completo</label>
+                        <input type="text" id="customerName" placeholder="Como no seu banco" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-blue-500 uppercase mb-2 ml-2">E-mail de Entrega</label>
+                        <input type="email" id="customerEmail" placeholder="seu@email.com" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 font-bold">
+                    </div>
                 </div>
+
                 <button type="button" onclick="startPaymentFlow(event)" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center shadow-lg shadow-blue-900/40">
-                    Ir para Pagamento Real <i data-lucide="external-link" class="ml-2 w-4 h-4"></i>
+                    Gerar Pagamento PIX <i data-lucide="qr-code" class="ml-2 w-4 h-4"></i>
                 </button>
             </div>
-            <div id="checkoutStep2" class="step text-center py-6">
-                <div class="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i data-lucide="check-circle" class="w-8 h-8 text-blue-500"></i>
+
+            <!-- PASSO DO PIX -->
+            <div id="checkoutStep2" class="step text-center py-2">
+                <div class="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="qr-code" class="w-8 h-8 text-blue-500"></i>
                 </div>
-                <h3 class="text-xl font-bold mb-4 uppercase">Pagamento Aberto</h3>
-                <p class="text-slate-400 text-sm mb-6">Uma nova aba abriu. Regresse aqui assim que terminar para descarregar.</p>
-                <button type="button" onclick="closeModal('buyModal')" class="w-full bg-slate-900 border border-slate-800 py-4 rounded-xl font-bold text-xs uppercase tracking-widest">Fechar</button>
+                <h3 class="text-xl font-bold mb-2 uppercase">Pagamento via PIX</h3>
+                <p class="text-slate-400 text-xs mb-6">Realize o pagamento para a chave abaixo e aguarde a aprovação manual.</p>
+                
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
+                    <div class="text-[10px] text-slate-500 uppercase font-black mb-1">Valor a pagar</div>
+                    <div id="pixDisplayPrice" class="text-2xl font-black text-blue-400 mb-4">R$ 0.00</div>
+                    
+                    <div class="text-[10px] text-slate-500 uppercase font-black mb-1">Chave PIX</div>
+                    <div class="flex items-center bg-slate-950 rounded-xl p-3 border border-slate-800">
+                        <span id="pixKeyDisplay" class="flex-1 text-xs font-mono truncate mr-2">Carregando chave...</span>
+                        <button onclick="copyPixKey()" class="text-blue-500 hover:text-blue-400"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+
+                <div class="text-left space-y-2 mb-6">
+                    <div class="flex items-center text-xs text-slate-400"><i data-lucide="info" class="w-3 h-3 mr-2 text-blue-500"></i> O acesso será enviado ao seu e-mail.</div>
+                    <div class="flex items-center text-xs text-slate-400"><i data-lucide="clock" class="w-3 h-3 mr-2 text-blue-500"></i> Aprovação em até 15 minutos.</div>
+                </div>
+
+                <button type="button" onclick="closeModal('buyModal')" class="w-full bg-slate-900 border border-slate-800 py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-800 transition">Entendido, já paguei</button>
             </div>
         </div>
     </div>
@@ -192,9 +225,9 @@
                     <input type="url" id="pImg" placeholder="Link da Imagem" class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
                 </div>
                 <div class="bg-blue-600/5 p-5 rounded-2xl border border-blue-500/20">
-                    <label class="block text-[10px] font-black text-blue-400 uppercase mb-3">Links Operacionais</label>
-                    <input type="text" id="pPaymentLink" required placeholder="Link Mercado Pago (ex: mpago.la/...)" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 mb-3 outline-none focus:border-blue-500">
+                    <label class="block text-[10px] font-black text-blue-400 uppercase mb-3">Link Operacional</label>
                     <input type="url" id="pFileUrl" required placeholder="Link de Download Direto" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                    <p class="text-[10px] text-slate-600 mt-2">* Link que o cliente recebe após aprovação.</p>
                 </div>
                 <textarea id="pDesc" rows="3" placeholder="Pequena descrição..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-blue-500 resize-none"></textarea>
                 <button type="submit" class="w-full bg-blue-600 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs">Guardar Alterações</button>
@@ -218,7 +251,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, deleteDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDl2p1KyuFPWDrQ0njJrs2kvRksP0TpnYg",
@@ -238,13 +271,14 @@
         const productsCol = collection(db, 'artifacts', appId, 'public', 'data', 'products');
         const couponsCol = collection(db, 'artifacts', appId, 'public', 'data', 'coupons');
         const ordersCol = collection(db, 'artifacts', appId, 'public', 'data', 'orders');
+        const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global');
 
         let products = [];
         let coupons = [];
         let orders = [];
+        let globalSettings = { pixKey: '' };
         let currentProduct = null;
         let finalPriceVal = 0;
-        let appliedCouponCode = null; // Armazena o cupom atual
 
         // AUTH & INIT
         const initAuth = async () => {
@@ -258,13 +292,22 @@
         };
 
         onAuthStateChanged(auth, (u) => { 
-            if (u) { loadData(); checkSuccessRedirect(); }
+            if (u) { loadData(); }
         });
 
         initAuth();
 
         function loadData() {
             if (!auth.currentUser) return;
+
+            // Load Settings
+            onSnapshot(settingsDoc, (snap) => {
+                if (snap.exists()) {
+                    globalSettings = snap.data();
+                    const input = document.getElementById('settingPixKey');
+                    if (input) input.value = globalSettings.pixKey || '';
+                }
+            });
 
             onSnapshot(productsCol, (snap) => {
                 products = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -284,28 +327,6 @@
                 renderAdminOrders();
                 lucide.createIcons();
             });
-        }
-
-        function checkSuccessRedirect() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const status = urlParams.get('status') || urlParams.get('collection_status');
-            const prodId = urlParams.get('external_reference'); 
-
-            if (status === 'approved' && prodId) {
-                const check = () => {
-                    const p = products.find(x => x.id === prodId);
-                    if (p) {
-                        document.getElementById('downloadBtn').href = p.fileUrl;
-                        document.getElementById('successModal').classList.remove('hidden');
-                        lucide.createIcons();
-                    } else if (products.length > 0) {
-                        console.log("Aguardando carregamento...");
-                    } else {
-                        setTimeout(check, 500);
-                    }
-                };
-                check();
-            }
         }
 
         function renderShop() {
@@ -342,7 +363,6 @@
             currentProduct = products.find(p => p.id === id);
             if (!currentProduct) return;
             finalPriceVal = parseFloat(currentProduct.price);
-            appliedCouponCode = null; // Reseta cupom ao abrir checkout
             
             document.getElementById('buyProductName').innerText = currentProduct.name;
             document.getElementById('finalPrice').innerText = `R$ ${finalPriceVal.toFixed(2)}`;
@@ -350,6 +370,7 @@
             
             document.getElementById('inputCoupon').value = '';
             document.getElementById('customerEmail').value = '';
+            document.getElementById('customerName').value = '';
             setStep(1);
             document.getElementById('buyModal').classList.remove('hidden');
             lucide.createIcons();
@@ -359,45 +380,52 @@
             if (e) e.preventDefault();
             if (!auth.currentUser) return alert("Erro de ligação. Recarregue.");
 
-            const emailInput = document.getElementById('customerEmail');
-            const email = emailInput.value.trim();
+            const email = document.getElementById('customerEmail').value.trim();
+            const name = document.getElementById('customerName').value.trim();
             
+            if (!name || name.length < 3) {
+                alert("Por favor, insira seu nome completo.");
+                return;
+            }
             if (!email || !email.includes('@')) {
                 alert("Insira um e-mail válido para a entrega.");
-                emailInput.focus();
                 return;
             }
 
-            if (!currentProduct.paymentLink) return alert("Erro: Link de checkout não configurado.");
-
+            // Show PIX data
+            document.getElementById('pixDisplayPrice').innerText = `R$ ${finalPriceVal.toFixed(2)}`;
+            document.getElementById('pixKeyDisplay').innerText = globalSettings.pixKey || 'CHAVE NÃO CONFIGURADA';
+            
             setStep(2);
 
             try {
-                // Adicionado campo 'coupon' no registro do pedido
                 await addDoc(ordersCol, {
                     email: email,
+                    customerName: name,
                     productId: currentProduct.id,
                     productName: currentProduct.name,
                     price: finalPriceVal,
-                    coupon: appliedCouponCode || 'Nenhum',
                     status: 'pendente',
                     createdAt: Date.now()
                 });
-
-                let rawUrl = currentProduct.paymentLink.trim();
-                if (!rawUrl.startsWith('http')) rawUrl = 'https://' + rawUrl;
-
-                const urlObj = new URL(rawUrl);
-                const separator = urlObj.search ? '&' : '?';
-                const finalRedir = urlObj.href + separator + 'external_reference=' + currentProduct.id;
-
-                window.open(finalRedir, '_blank');
-
             } catch (err) {
                 console.error("Erro checkout:", err);
                 alert("Erro ao registar pedido no banco de dados.");
                 setStep(1);
             }
+        };
+
+        window.copyPixKey = () => {
+            const key = document.getElementById('pixKeyDisplay').innerText;
+            if (key === 'CHAVE NÃO CONFIGURADA') return;
+            
+            const el = document.createElement('textarea');
+            el.value = key;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert("Chave PIX copiada!");
         };
 
         window.applyCoupon = () => {
@@ -406,16 +434,20 @@
             if (cp) {
                 const disc = (parseFloat(currentProduct.price) * (parseFloat(cp.discountPercent) / 100));
                 finalPriceVal = parseFloat(currentProduct.price) - disc;
-                appliedCouponCode = code; // Salva o código aplicado
                 document.getElementById('finalPrice').innerText = `R$ ${finalPriceVal.toFixed(2)}`;
                 alert("Cupom de " + cp.discountPercent + "% aplicado!");
-            } else { 
-                appliedCouponCode = null;
-                alert("Cupom inválido ou expirado."); 
-            }
+            } else { alert("Cupom inválido ou expirado."); }
         };
 
         // ADMIN FUNCTIONS
+        window.saveSettings = async () => {
+            const key = document.getElementById('settingPixKey').value.trim();
+            try {
+                await setDoc(settingsDoc, { pixKey: key }, { merge: true });
+                alert("Configurações salvas!");
+            } catch (e) { alert("Erro ao salvar."); }
+        };
+
         function renderAdminProducts() {
             const tbody = document.getElementById('adminTableProducts');
             tbody.innerHTML = products.map(p => `
@@ -449,13 +481,13 @@
             tbody.innerHTML = sorted.map(o => `
                 <tr class="hover:bg-slate-900 transition border-b border-slate-900/50 text-xs">
                     <td class="px-8 py-5 text-slate-500 text-nowrap">${new Date(o.createdAt).toLocaleDateString()}</td>
-                    <td class="px-8 py-5 font-bold text-nowrap">${o.email}</td>
+                    <td class="px-8 py-5">
+                        <div class="font-bold text-blue-400">${o.customerName || 'N/A'}</div>
+                        <div class="text-slate-400 text-[10px]">${o.email}</div>
+                    </td>
                     <td class="px-8 py-5">
                         <div class="font-bold text-nowrap">${o.productName}</div>
                         <div class="text-blue-400 font-mono text-[10px]">R$ ${parseFloat(o.price).toFixed(2)}</div>
-                    </td>
-                    <td class="px-8 py-5 font-mono text-blue-300">
-                        ${o.coupon || '-'}
                     </td>
                     <td class="px-8 py-5 text-right">
                         <div class="flex items-center justify-end space-x-2">
@@ -468,9 +500,6 @@
                                         <i data-lucide="check-circle" class="w-4 h-4"></i>
                                     </button>
                                 ` : ''}
-                                <button type="button" onclick="copyLink('${o.productId}')" class="btn-action bg-slate-500/10 p-2 rounded-lg text-slate-400 hover:bg-slate-500 hover:text-white" title="Copiar Link de Download">
-                                    <i data-lucide="copy" class="w-4 h-4"></i>
-                                </button>
                                 <button type="button" onclick="sendProductEmail('${o.id}')" class="btn-action bg-blue-500/10 p-2 rounded-lg text-blue-500 hover:bg-blue-500 hover:text-white" title="Enviar E-mail">
                                     <i data-lucide="mail" class="w-4 h-4"></i>
                                 </button>
@@ -484,27 +513,12 @@
             lucide.createIcons();
         }
 
-        // NOVO: Função para copiar o link rapidamente (torna o envio manual muito veloz)
-        window.copyLink = (productId) => {
-            const product = products.find(p => p.id === productId);
-            if (!product || !product.fileUrl) return alert("Link não encontrado.");
-            
-            const tempInput = document.createElement('input');
-            tempInput.value = product.fileUrl;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            
-            alert("Link de download copiado para a área de transferência!");
-        };
-
         window.sendProductEmail = (orderId) => {
             const order = orders.find(o => o.id === orderId);
             const product = products.find(p => p.id === order.productId);
             if (!order || !product) return alert("Dados não encontrados.");
             const sub = encodeURIComponent(`LETHAL aim - Entrega: ${product.name}`);
-            const body = encodeURIComponent(`Olá!\n\nAqui está o link para descarregar o seu ficheiro:\n${product.fileUrl}\n\nObrigado pela compra!`);
+            const body = encodeURIComponent(`Olá ${order.customerName}!\n\nAqui está o link para descarregar o seu ficheiro:\n${product.fileUrl}\n\nObrigado pela compra!`);
             window.location.href = `mailto:${order.email}?subject=${sub}&body=${body}`;
         };
 
@@ -513,9 +527,8 @@
             try {
                 const orderRef = doc(db, 'artifacts', appId, 'public', 'data', 'orders', id);
                 await updateDoc(orderRef, { status: 'aprovado' });
-                alert("Pedido aprovado com sucesso!");
+                alert("Pedido aprovado! Lembre-se de enviar o link para o cliente.");
             } catch (e) {
-                console.error("Erro aprovação:", e);
                 alert("Erro ao aprovar: " + e.message);
             }
         };
@@ -526,10 +539,8 @@
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId);
                     await deleteDoc(docRef);
-                    console.log(`Documento ${docId} removido da coleção ${collectionName}`);
                 } catch (e) {
-                    console.error("Erro na exclusão:", e);
-                    alert("Falha ao excluir do Firebase: " + e.message);
+                    alert("Falha ao excluir: " + e.message);
                 }
             }
         };
@@ -542,52 +553,11 @@
             document.getElementById('pCategory').value = p.category;
             document.getElementById('pPrice').value = p.price;
             document.getElementById('pImg').value = p.imageUrl || '';
-            document.getElementById('pPaymentLink').value = p.paymentLink || '';
             document.getElementById('pFileUrl').value = p.fileUrl || '';
             document.getElementById('pDesc').value = p.description || '';
             document.getElementById('productModalTitle').innerText = "Editar Produto";
             document.getElementById('productModal').classList.remove('hidden');
             lucide.createIcons();
-        };
-
-        // SETUP EVENT LISTENERS (Protegido contra NULL)
-        const setupForms = () => {
-            const prodForm = document.getElementById('productForm');
-            if(prodForm) {
-                prodForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    if (!auth.currentUser) return;
-                    const id = document.getElementById('editProductId').value;
-                    const data = {
-                        name: document.getElementById('pName').value,
-                        category: document.getElementById('pCategory').value,
-                        price: document.getElementById('pPrice').value,
-                        imageUrl: document.getElementById('pImg').value,
-                        paymentLink: document.getElementById('pPaymentLink').value,
-                        fileUrl: document.getElementById('pFileUrl').value,
-                        description: document.getElementById('pDesc').value
-                    };
-                    try {
-                        id ? await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id), data, {merge:true}) : await addDoc(productsCol, data);
-                        closeModal('productModal');
-                    } catch (err) { alert("Erro ao salvar produto."); }
-                });
-            }
-
-            const coupForm = document.getElementById('couponForm');
-            if(coupForm) {
-                coupForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    if (!auth.currentUser) return;
-                    try {
-                        await addDoc(couponsCol, {
-                            code: document.getElementById('cCode').value.toUpperCase(),
-                            discountPercent: document.getElementById('cDiscount').value
-                        });
-                        closeModal('couponModal');
-                    } catch (err) { alert("Erro ao salvar cupom."); }
-                });
-            }
         };
 
         // UI HELPERS
@@ -637,9 +607,36 @@
         };
         window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
 
-        // Inicializar após carregamento
+        // Form Submitters
         window.addEventListener('load', () => {
-            setupForms();
+            document.getElementById('productForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('editProductId').value;
+                const data = {
+                    name: document.getElementById('pName').value,
+                    category: document.getElementById('pCategory').value,
+                    price: document.getElementById('pPrice').value,
+                    imageUrl: document.getElementById('pImg').value,
+                    fileUrl: document.getElementById('pFileUrl').value,
+                    description: document.getElementById('pDesc').value
+                };
+                try {
+                    id ? await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id), data, {merge:true}) : await addDoc(productsCol, data);
+                    closeModal('productModal');
+                } catch (err) { alert("Erro ao salvar."); }
+            });
+
+            document.getElementById('couponForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    await addDoc(couponsCol, {
+                        code: document.getElementById('cCode').value.toUpperCase(),
+                        discountPercent: document.getElementById('cDiscount').value
+                    });
+                    closeModal('couponModal');
+                } catch (err) { alert("Erro ao salvar."); }
+            });
+
             lucide.createIcons();
         });
     </script>
